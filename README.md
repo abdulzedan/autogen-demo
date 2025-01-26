@@ -31,7 +31,7 @@ The **Collaborative Writing Tool** allows a user to supply a message or prompt. 
 
 The frontend (Next.js) offers a simple chatbot-style interface where the user can input text and see the pipeline steps in the conversation.
 
-![FrontendPicture](frontend_example.jpg)
+![FrontendPicture](frontend_example.png)
 
 ---
 
