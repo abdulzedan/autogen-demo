@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+openai
+autogen 
+# For Azure usage
+azure-identity==1.13.0
+requests==2.31.0
+# Optional local vector DB usage
+chromadb==0.3.23

@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_container
+    # Publish the backend on port 8000... that's what FastAPI prots to by default
+    ports:
+      - "8000:8000"
+    # Load environment variables (Azure keys, Bing keys, etc.) from .env
+    environment:
+      BING_SEARCH_SUBSCRIPTION_KEY: "${BING_SEARCH_SUBSCRIPTION_KEY}"
+      BING_SEARCH_ENDPOINT: "${BING_SEARCH_ENDPOINT}"
+      AZURE_OPENAI_ENDPOINT: "${AZURE_OPENAI_ENDPOINT}"
+      AZURE_OPENAI_API_KEY: "${AZURE_OPENAI_API_KEY}"
+      AZURE_OPENAI_VERSION: "${AZURE_OPENAI_VERSION}"
+      AZURE_OPENAI_DEPLOYMENT: "${AZURE_OPENAI_DEPLOYMENT}"
+      AZURE_OPENAI_EMBEDDING_MODEL: "${AZURE_OPENAI_EMBEDDING_MODEL}"
+
+    # If you had a database or other services that must start first,
+    # you could add depends_on here. For now, it's not mandatory.... check out the db depedency file that you can adjust 
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    # Publish the frontend on port 3000
+    ports:
+      - "3000:3000"
+    # the frontend needs to call the backend by internal Docker DNS "backend"
+    # this is why we pass that as an environment variable here beloow
+    environment:
+      # In Next.js, environment variables starting with NEXT_PUBLIC_ are exposed client-side
+      NEXT_PUBLIC_API_URL: "http://backend:8000"
+    depends_on:
+      - backend

@@ -1,0 +1,34 @@
+# ---- STAGE 1: Build environment ----
+    FROM python:3.10-slim as builder
+
+    WORKDIR /usr/src/app
+    
+    # Copy requirement list
+    COPY requirements.txt .
+    # Install dependencies into a local folder (so final image doesn't carry dev tools)
+    RUN pip install --user --no-cache-dir -r requirements.txt
+    
+    COPY . ./
+    
+    # ---- STAGE 2: Final runtime image ----
+    FROM python:3.10-slim
+    
+    # Create a non-root user..... this is typically best practice
+    RUN useradd -m myuser
+    USER myuser
+    
+    WORKDIR /home/myuser/app
+    
+    COPY --from=builder /home/myuser/.local /home/myuser/.local
+    
+    # Copy my app code from the builder stage
+    COPY --from=builder /usr/src/app /home/myuser/app
+    
+    # Make sure Python can find installed packages
+    ENV PATH="/home/myuser/.local/bin:${PATH}"
+    
+    EXPOSE 8000
+    
+    # Run uvicorn in production
+    CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    

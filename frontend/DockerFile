@@ -1,0 +1,32 @@
+# ---- STAGE 1: Build ----
+    FROM node:18 as build
+
+    WORKDIR /app
+    
+    # Install dependencies
+    COPY package*.json ./
+    RUN npm install
+    
+    # Copy the rest of the frontend code
+    COPY . ./
+    
+    # Build the Next.js app
+    RUN npm run build
+    
+    # ---- STAGE 2: Production ----
+    FROM node:18-slim
+    
+    # Create a non-root user
+    RUN useradd -m myfrontend
+    USER myfrontend
+    
+    WORKDIR /home/myfrontend/app
+    
+    # Copy built artifacts from stage 1
+    COPY --from=build /app ./
+    
+    # Expose Next.js port
+    EXPOSE 3000
+    
+    CMD ["npm", "run", "start"]
+    
