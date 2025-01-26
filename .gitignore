@@ -24,5 +24,4 @@ chroma/
 
 # Next.js build
 .next/
-
 .cache/
